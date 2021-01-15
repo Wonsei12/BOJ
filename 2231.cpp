@@ -24,35 +24,27 @@ const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n, m; cin >> n >> m;
-	int cursor = 0;
-	vector<int> a(n);
-	for(int i=0 ; i<n ; i++)
-		cin >> a[i];
-	int cnt = 1;
-	vector<int> ans(n);
-	int prev = 0;
-	for(int i=9 ; i>=0 ; i--) {
-		for(int j=prev ; j<n ; j++) {
-			if(a[j]==i) {
-				cursor = j;
-				ans[j] = cnt++;
-			}
+	int n; cin >> n;
+	auto x = [](int a) -> int {
+		int s = a;
+		while(a>0) {
+			s+=a%10;
+			a/=10;
 		}
-		for(int j=0 ; j<prev ; j++) {
-			if(a[j]==i) {
-				cursor = j;
-				ans[j] = cnt++;
-			}
+		return s;
+	};
+	for(int i=1 ; i<=n ; i++) {
+		if(x(i)==n) {
+			cout << i << "\n";
+			return;
 		}
-		prev = cursor;
 	}
-	cout << ans[m] << "\n";
+	cout << 0 << "\n";
 }
 
 int main() {
 	IOS;
-	int t; cin >> t;
+	int t = 1;
 	while(t--)
 		solve();
 }

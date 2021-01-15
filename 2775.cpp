@@ -24,30 +24,18 @@ const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n, m; cin >> n >> m;
-	int cursor = 0;
-	vector<int> a(n);
-	for(int i=0 ; i<n ; i++)
-		cin >> a[i];
-	int cnt = 1;
-	vector<int> ans(n);
-	int prev = 0;
-	for(int i=9 ; i>=0 ; i--) {
-		for(int j=prev ; j<n ; j++) {
-			if(a[j]==i) {
-				cursor = j;
-				ans[j] = cnt++;
-			}
-		}
-		for(int j=0 ; j<prev ; j++) {
-			if(a[j]==i) {
-				cursor = j;
-				ans[j] = cnt++;
-			}
-		}
-		prev = cursor;
+	int k, n; cin >> k >> n;
+	vector<vector<int>> a(k+1,vector<int>(n));
+	for(int i=0 ; i<n ; i++) {
+		a[0][i] = i+1;
 	}
-	cout << ans[m] << "\n";
+	for(int i=1 ; i<=k ; i++) {
+		a[i][0] = a[i-1][0];
+		for(int j=1 ; j<n ; j++) {
+			a[i][j] = a[i][j-1] + a[i-1][j]; 
+		}
+	}
+	cout << a[k][n-1] << "\n";
 }
 
 int main() {

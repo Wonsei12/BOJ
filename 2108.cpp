@@ -24,35 +24,42 @@ const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n, m; cin >> n >> m;
-	int cursor = 0;
+	int n; cin >> n;
 	vector<int> a(n);
-	for(int i=0 ; i<n ; i++)
+	vector<int> cnt(10000);
+	ll sum = 0;
+	int mxcnt = 0;
+	int mx=-6000,mn=6000;
+	for(int i=0 ; i<n ; i++) {
 		cin >> a[i];
-	int cnt = 1;
-	vector<int> ans(n);
-	int prev = 0;
-	for(int i=9 ; i>=0 ; i--) {
-		for(int j=prev ; j<n ; j++) {
-			if(a[j]==i) {
-				cursor = j;
-				ans[j] = cnt++;
-			}
-		}
-		for(int j=0 ; j<prev ; j++) {
-			if(a[j]==i) {
-				cursor = j;
-				ans[j] = cnt++;
-			}
-		}
-		prev = cursor;
+		sum += a[i];
+		mx=max(mx,a[i]);
+		mn=min(mn,a[i]);
+		cnt[a[i]+4000] += 1;
+		mxcnt=max(mxcnt,cnt[a[i]+4000]);
 	}
-	cout << ans[m] << "\n";
+	bool vis=0;
+	int freq = -1;
+	for(int i=0 ; i<10000 ; i++) {
+		if(cnt[i]==mxcnt&&!vis) {
+			freq=i-4000;
+			vis=1;
+		} else if(cnt[i]==mxcnt&&vis) {
+			freq=i-4000;
+			break;
+		} 
+	}
+	sort(a.begin(),a.end());
+	cout << fixed << setprecision(0);
+	cout << (double)sum / n << "\n";
+	cout << a[n / 2] << "\n";
+	cout << freq << "\n";
+	cout << mx-mn << "\n";
 }
 
 int main() {
 	IOS;
-	int t; cin >> t;
+	int t; t = 1;
 	while(t--)
 		solve();
 }

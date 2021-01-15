@@ -23,37 +23,37 @@ using ll = long long;
 const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
-void solve() {
-	int n; ll m; cin >> n >> m;
-	vector<ll> a(n);
-	for(int i=0 ; i<n ; i++) {
-		cin >> a[i];
-	}
-	ll l = 0, r = 2e9;
-	ll ans = 0;
-	auto solve = [&](ll x) {
-		ll ans = 0;
-		for(int i=0 ; i<n ; i++) {
-			if(a[i]<=x)
-				continue;
-			ans += a[i]-x;
-		}
-		return ans >= m;
-	};
-	while(l<=r) {
-		ll mid = (l+r) / 2;
-		if(solve(mid)) {
-			l = mid + 1;
-			ans = mid;
-		} else 
-			r = mid - 1;
-	}
-	cout << ans << "\n";
-}
-
 int main() {
 	IOS;
-	int t; t = 1;
-	while(t--)
-		solve();
+	while(1) {
+		string s; 
+		getline(cin, s);
+		if(s==".")
+			break;
+		stack<int> st;
+		bool fail = false;
+		for(int i=0; i<sz(s) ; i++) {
+			if(s[i]=='(')
+				st.push(1);
+			else if(s[i]=='[')
+				st.push(2);
+			else if(s[i]==')') {
+				if(!sz(st)||st.top()==2)
+					fail = true;
+				else 
+					st.pop();
+			} else if(s[i] == ']') {
+				if(!sz(st)||st.top()==1)
+					fail = true;
+				else 
+					st.pop();
+			}
+		}
+		if(sz(st))
+			fail = true;
+		if(fail)
+			cout << "no\n";
+		else
+			cout << "yes\n";
+	}
 }

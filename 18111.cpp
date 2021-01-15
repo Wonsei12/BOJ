@@ -20,35 +20,40 @@ using namespace std;
 
 using pii = pair<int, int>;
 using ll = long long;
-const ll MOD = 1e9 + 7;
+const ll MOD = 1234567891;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n; ll m; cin >> n >> m;
-	vector<ll> a(n);
+	int n, m; ll b; cin >> n >> m >> b;
+	vector<vector<ll>> a(n, vector<ll>(m));
 	for(int i=0 ; i<n ; i++) {
-		cin >> a[i];
+		for(int j=0 ; j<m ; j++) {
+			cin >> a[i][j];
+		}	
 	}
-	ll l = 0, r = 2e9;
-	ll ans = 0;
-	auto solve = [&](ll x) {
-		ll ans = 0;
+	ll mn = LLINF, mnIdx;
+	for(int h=0 ; h<=256 ; h++) {
+		ll need=0, time=0, have=0;
 		for(int i=0 ; i<n ; i++) {
-			if(a[i]<=x)
-				continue;
-			ans += a[i]-x;
+			for(int j=0 ; j<m ; j++) {
+				if(a[i][j] < h) {
+					need += h - a[i][j];
+					time += h - a[i][j];
+				}
+				else {
+					have += a[i][j] - h;
+					time += 2 * (a[i][j] - h);
+				}
+			}
 		}
-		return ans >= m;
-	};
-	while(l<=r) {
-		ll mid = (l+r) / 2;
-		if(solve(mid)) {
-			l = mid + 1;
-			ans = mid;
-		} else 
-			r = mid - 1;
+		if(need > b + have)
+			continue;
+		if(mn > time) {
+			mn = time;
+			mnIdx = h;
+		}
 	}
-	cout << ans << "\n";
+	cout << mn << " " << mnIdx << "\n";
 }
 
 int main() {

@@ -24,31 +24,39 @@ const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n; ll m; cin >> n >> m;
-	vector<ll> a(n);
-	for(int i=0 ; i<n ; i++) {
-		cin >> a[i];
-	}
-	ll l = 0, r = 2e9;
-	ll ans = 0;
-	auto solve = [&](ll x) {
-		ll ans = 0;
-		for(int i=0 ; i<n ; i++) {
-			if(a[i]<=x)
-				continue;
-			ans += a[i]-x;
+	int m; cin >> m;
+	queue<int> q;
+	while(m--) {
+		string s; cin >> s;
+		if(s=="size") {
+			cout << sz(q) << "\n";
+		} else if(s=="push") {
+			int x; cin >> x;
+			q.push(x);
+		} else if(s=="front") {
+			if(sz(q)) 
+				cout << q.front() << "\n";
+			else
+				cout << -1 << "\n";
+		} else if(s=="empty") {
+			if(sz(q))
+				cout << 0 << "\n";
+			else
+				cout << 1 << "\n";
+		} else if(s=="back") {
+			if(sz(q)) 
+				cout << q.back() << "\n";
+			else
+				cout << -1 << "\n";
 		}
-		return ans >= m;
-	};
-	while(l<=r) {
-		ll mid = (l+r) / 2;
-		if(solve(mid)) {
-			l = mid + 1;
-			ans = mid;
-		} else 
-			r = mid - 1;
+		else {
+			if(sz(q)) {
+				cout << q.front() << "\n";
+				q.pop();
+			} else
+				cout << -1 << "\n";
+		}
 	}
-	cout << ans << "\n";
 }
 
 int main() {

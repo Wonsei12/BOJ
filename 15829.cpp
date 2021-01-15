@@ -20,33 +20,18 @@ using namespace std;
 
 using pii = pair<int, int>;
 using ll = long long;
-const ll MOD = 1e9 + 7;
+const ll MOD = 1234567891;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n; ll m; cin >> n >> m;
-	vector<ll> a(n);
-	for(int i=0 ; i<n ; i++) {
-		cin >> a[i];
-	}
-	ll l = 0, r = 2e9;
+	int n; string s; cin >> n >> s;
+	ll pow = 1;
 	ll ans = 0;
-	auto solve = [&](ll x) {
-		ll ans = 0;
-		for(int i=0 ; i<n ; i++) {
-			if(a[i]<=x)
-				continue;
-			ans += a[i]-x;
-		}
-		return ans >= m;
-	};
-	while(l<=r) {
-		ll mid = (l+r) / 2;
-		if(solve(mid)) {
-			l = mid + 1;
-			ans = mid;
-		} else 
-			r = mid - 1;
+	for(char c : s) {
+		ans += (c-'a'+1) * pow;
+		pow *= 31;
+		pow %= MOD;
+		ans %= MOD;
 	}
 	cout << ans << "\n";
 }

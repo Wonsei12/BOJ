@@ -24,36 +24,19 @@ const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n; ll m; cin >> n >> m;
-	vector<ll> a(n);
-	for(int i=0 ; i<n ; i++) {
-		cin >> a[i];
+	int n; cin >> n;
+	vector<int> dp1(n+1), dp2(n+1);
+	dp1[0]=1; dp2[1]=1;
+	for(int i=2 ; i<=n ; i++) {
+		dp1[i]=dp1[i-1]+dp1[i-2];
+		dp2[i]=dp2[i-1]+dp2[i-2];
 	}
-	ll l = 0, r = 2e9;
-	ll ans = 0;
-	auto solve = [&](ll x) {
-		ll ans = 0;
-		for(int i=0 ; i<n ; i++) {
-			if(a[i]<=x)
-				continue;
-			ans += a[i]-x;
-		}
-		return ans >= m;
-	};
-	while(l<=r) {
-		ll mid = (l+r) / 2;
-		if(solve(mid)) {
-			l = mid + 1;
-			ans = mid;
-		} else 
-			r = mid - 1;
-	}
-	cout << ans << "\n";
+	cout << dp1[n] << " " << dp2[n] << "\n";
 }
 
 int main() {
 	IOS;
-	int t; t = 1;
+	int t; cin >> t;
 	while(t--)
 		solve();
 }

@@ -24,31 +24,31 @@ const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n; ll m; cin >> n >> m;
-	vector<ll> a(n);
-	for(int i=0 ; i<n ; i++) {
-		cin >> a[i];
-	}
-	ll l = 0, r = 2e9;
-	ll ans = 0;
-	auto solve = [&](ll x) {
-		ll ans = 0;
-		for(int i=0 ; i<n ; i++) {
-			if(a[i]<=x)
-				continue;
-			ans += a[i]-x;
+	int n, k; cin >> n >> k;
+	vector<bool> vis(n);
+	int idx = 0;
+	int yes = 0;
+	int cnt = 0;
+	vector<int> ans;
+	while(1) {
+		if(!vis[idx])
+			yes += 1;
+		if(yes==k) {
+			yes=0;
+			cnt+=1;
+			vis[idx]=1;
+			ans.push_back(idx+1);
 		}
-		return ans >= m;
-	};
-	while(l<=r) {
-		ll mid = (l+r) / 2;
-		if(solve(mid)) {
-			l = mid + 1;
-			ans = mid;
-		} else 
-			r = mid - 1;
+		if(cnt==n)
+			break;
+		idx+=1;
+		idx%=n;
 	}
-	cout << ans << "\n";
+	cout << "<";
+	for(int i=0 ; i<n-1 ; i++) {
+		cout << ans[i] << ", ";
+	}
+	cout << ans[n-1] << ">";
 }
 
 int main() {

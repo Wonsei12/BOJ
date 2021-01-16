@@ -24,19 +24,52 @@ const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n, r, c; cin >> n >> r >> c;
-	int ans = 0;
-	while(n--) {
-		if(r>=(1<<n)&&c>=(1<<n)) {
-			ans += 3 * (1<<n) * (1<<n);
-			r-=1<<n;
-			c-=1<<n;
-		} else if(r>=(1<<n)) {
-			ans += 2 * (1<<n) * (1<<n);
-			r-=1<<n;
-		} else if(c>=(1<<n)) {
-			ans += (1<<n) * (1<<n);
-			c-=1<<n;
+	int n; cin >> n;
+	int k; cin >> k;
+	vector<bool> ban(10);
+	if(k==10) {
+		cout << abs(n-100) << "\n";
+		return;
+	}
+	while(k--) {
+		int a; cin >> a; ban[a]=1;
+	}
+	int ans = abs(n-100);
+	int mn = -1;
+	auto allowed = [&](int x) -> bool {
+		if(x==0) {
+			if(ban[0])
+				return false;
+			else
+				return true;
+		}
+		while(x>0) {
+			if(ban[x%10])
+				return false;
+			x/=10;
+		}
+		return true;
+	};
+	auto len = [&](int x) -> int {
+		int cnt = 0;
+		if(x==0) {
+			return 1;
+		}
+		while(x>0) {
+			x/=10; cnt += 1;
+		}
+		return cnt;
+	};
+	for(int i=n ; i>=0 ; i--) {
+		if(allowed(i)) {
+			ans=min(ans,len(i)+abs(i-n));
+		}
+	}
+	for(int i=n ; i<=10000000 ; i++) {
+		if(abs(i-n)>ans)
+			break;
+		if(allowed(i)) {
+			ans=min(ans,len(i)+abs(n-i));
 		}
 	}
 	cout << ans << "\n";

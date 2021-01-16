@@ -25,30 +25,33 @@ const long double PI = acos(-1.0);
 
 void solve() {
 	int n; cin >> n;
-	vector<pii> a(n);
-	for(int i=0 ; i<n ; i++) {
-		cin >> a[i].ff >> a[i].ss;
+	vector<int> G[n];
+	int m; cin >> m;
+	while(m--) {
+		int u, v; cin >> u >> v; u--, v--;
+		G[u].push_back(v), G[v].push_back(u);
 	}
-	auto cmp = [](pii a, pii b) {
-		if(a.ss==b.ss)
-			return a.ff < b.ff;
-		return a.ss < b.ss;
-	};
-	sort(a.begin(),a.end(),cmp);
-	int cur = 0;
-	int ans = 0;
-	for(int i=0 ; i<n ; i++) {
-		if(a[i].ff >= cur) {
-			ans += 1;
-			cur = a[i].ss;
-		} 
+	queue<int> q;
+	q.push(0);
+	vector<bool> vis(n);
+	vis[0] = 1;
+	int cnt = 0;
+	while(!q.empty()) {
+		int cur = q.front(); q.pop();
+		for(int nxt : G[cur]) {
+			if(vis[nxt])
+				continue;
+			vis[nxt] = 1;
+			cnt += 1;
+			q.push(nxt);
+		}
 	}
-	cout << ans << "\n";
+	cout << cnt << "\n";
 }
 
 int main() {
 	IOS;
-	int t = 1;
+	int t; t = 1;
 	while(t--)
 		solve();
 }

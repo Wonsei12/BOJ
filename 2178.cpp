@@ -24,31 +24,34 @@ const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
 void solve() {
-	int n; cin >> n;
-	vector<pii> a(n);
-	for(int i=0 ; i<n ; i++) {
-		cin >> a[i].ff >> a[i].ss;
-	}
-	auto cmp = [](pii a, pii b) {
-		if(a.ss==b.ss)
-			return a.ff < b.ff;
-		return a.ss < b.ss;
+	int n, m; cin >> n >> m;
+	vector<string> G(n);
+	for(int i=0 ; i<n ; i++)
+		cin >> G[i];
+	queue<pii> q;
+	vector<vector<int>> ans(n, vector<int>(m));
+	ans[0][0] = 1;
+	q.push({0,0});
+	vector<int> dx={0,1,0,-1}, dy={1,0,-1,0};
+	auto isRange = [&](int x, int y) -> bool {
+		return x>=0&&x<n&&y>=0&&y<m;
 	};
-	sort(a.begin(),a.end(),cmp);
-	int cur = 0;
-	int ans = 0;
-	for(int i=0 ; i<n ; i++) {
-		if(a[i].ff >= cur) {
-			ans += 1;
-			cur = a[i].ss;
-		} 
+	while(!q.empty()) {
+		int curX = q.front().ff; int curY = q.front().ss; q.pop();
+		for(int i=0 ; i<4 ; i++) {
+			int nxtX = curX + dx[i], nxtY = curY + dy[i];
+			if(isRange(nxtX,nxtY)&&G[nxtX][nxtY]=='1'&&ans[nxtX][nxtY]==0) {
+				ans[nxtX][nxtY] = ans[curX][curY] + 1;
+				q.push({nxtX,nxtY});
+			}
+		}
 	}
-	cout << ans << "\n";
+	cout << ans[n-1][m-1] << "\n";
 }
 
 int main() {
 	IOS;
-	int t = 1;
+	int t; t = 1;
 	while(t--)
 		solve();
 }

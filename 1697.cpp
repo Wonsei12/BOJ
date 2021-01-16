@@ -29,7 +29,7 @@ void solve() {
 		cout << n - k << "\n";
 		return;
 	}
-	vector<bool> vis(k+1);
+	vector<bool> vis(300000);
 	vis[n]=1;
 	queue<pii> q; q.push({n,0});
 	while(!q.empty()) {
@@ -46,7 +46,7 @@ void solve() {
 			vis[cur+1]=1;
 			q.push({cur+1,cnt+1});
 		} 
-		if(cur*2<=k&&!vis[cur*2]) {
+		if(cur*2<300000&&!vis[cur*2]) {
 			vis[cur*2]=1;
 			q.push({cur*2,cnt+1});
 		}

@@ -48,7 +48,7 @@ void solve() {
 		}
 		if(need > b + have)
 			continue;
-		if(mn > time) {
+		if(mn >= time) {
 			mn = time;
 			mnIdx = h;
 		}

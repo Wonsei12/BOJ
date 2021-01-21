@@ -18,6 +18,11 @@ using namespace std;
 #define sz(x) (int)x.size()
 #define pw(x) (1LL<<x)
 
+using pii = pair<int, int>;
+using ll = long long;
+const ll MOD = 1e9 + 7;
+const long double PI = acos(-1.0);
+
 // Copied from Gennady-Korotkevich's template
 
 template <typename A, typename B>
@@ -117,25 +122,59 @@ void debug_out(Head H, Tail... T) {
 
 // End of Gennady-Korotkevich's template 
 
-using pii = pair<int, int>;
-using ll = long long;
-const ll MOD = 1e9 + 7;
-const long double PI = acos(-1.0);
+bool en = false;
 
-ll euclid(ll x, ll y, ll &k, ll &l) {
-	if (y == 0) {
-		k = 1;
-		l = 0;
-		return x;
+void solve() {
+	int n, e; cin >> n >> e;
+	if(n==0&&e==0) {
+		en = true;
+		return;
 	}
-	ll g = euclid(y, x % y, l, k);
-	l -= k * (x / y);
-	return g;
+	vector<vector<int>> G(n);
+	while(e--) {
+		int u, v; cin >> u >> v;
+		G[u].push_back(v); G[v].push_back(u);
+	}
+	int ans=0;
+	int t=0;
+	vector<bool> vis(n);
+	vector<int> low(n),tin(n);
+	function<void(int,int)> dfs = [&](int v, int p) {
+		bool is=false;
+		int c=0;
+		vis[v]=1;
+		tin[v]=low[v]=t++;
+		for(int nxt : G[v]) {
+			if(nxt==p) continue;
+			if(vis[nxt]) {
+				low[v]=min(low[v],tin[nxt]);
+			} else {
+				c++;
+				dfs(nxt,v);
+				low[v]=min(low[v],low[nxt]);
+				if(tin[v]<=low[nxt]&&p!=-1)
+					is=true;
+			}
+		}
+		if(p==-1&&c>1)
+			is=true;
+		if(is)
+			ans=max(ans,c);
+	};
+	int com=0;
+	for(int i=0 ; i<n ; i++) {
+		if(vis[i]) continue;
+		com+=1;
+		dfs(i,-1);
+	}
+	cout << ans+com-1 << "\n";
 }
 
-ll ceil(ll a, ll b) {
-	if(a >= 0) 
-		return (a+b-1) / a;
-	else
-		return a/b;
+int main() {
+	IOS;
+	while(1) {
+		solve();
+		if(en)
+			break;
+	}
 }

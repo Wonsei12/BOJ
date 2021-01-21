@@ -18,6 +18,11 @@ using namespace std;
 #define sz(x) (int)x.size()
 #define pw(x) (1LL<<x)
 
+using pii = pair<int, int>;
+using ll = long long;
+const ll MOD = 1e9 + 7;
+const long double PI = acos(-1.0);
+
 // Copied from Gennady-Korotkevich's template
 
 template <typename A, typename B>
@@ -117,25 +122,41 @@ void debug_out(Head H, Tail... T) {
 
 // End of Gennady-Korotkevich's template 
 
-using pii = pair<int, int>;
-using ll = long long;
-const ll MOD = 1e9 + 7;
-const long double PI = acos(-1.0);
-
-ll euclid(ll x, ll y, ll &k, ll &l) {
-	if (y == 0) {
-		k = 1;
-		l = 0;
-		return x;
+void solve() {
+	int n; cin >> n;
+	vector<vector<int>> G(n);
+	for(int i=0 ; i<n-1 ; i++) {
+		int u, v; cin >> u >> v; u--, v--;
+		G[u].push_back(v); G[v].push_back(u);
 	}
-	ll g = euclid(y, x % y, l, k);
-	l -= k * (x / y);
-	return g;
+	vector<ll> dep(n), val(n), par(n);
+	function<int(int, int)> dfs = [&](int v, int p) {
+		val[v] = 1; par[v] = p;
+		for(int nxt : G[v]) {
+			if(nxt == p) continue;
+			dep[nxt] = dep[v] + 1;
+			val[v] += dfs(nxt,v);
+		}
+		return val[v];
+	};
+	dfs(0,-1);
+	ll ans = 0;
+	for(int i=0 ; i<n ; i++)
+		ans += val[i] * (n - val[i]);
+	for(int i=0 ; i<n ; i++) {
+		ll cur = val[i] * (val[i]-1) / 2;
+		for(int nxt : G[i]) {
+			if(nxt == par[i]) continue;
+			cur -= val[nxt] * (val[nxt]-1) / 2;
+		} 
+		ans += cur * dep[i];
+	}
+	cout << ans << "\n";
 }
 
-ll ceil(ll a, ll b) {
-	if(a >= 0) 
-		return (a+b-1) / a;
-	else
-		return a/b;
+int main() {
+	IOS;
+	int t; t = 1;
+	while(t--)
+		solve();
 }

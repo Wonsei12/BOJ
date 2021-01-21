@@ -23,46 +23,6 @@ using ll = long long;
 const ll MOD = 20150523;
 const long double PI = acos(-1.0);
 
-ll solve1(string s) { // 1~s까지 3의 배수가 몇개 있는지
-	vector<vector<vector<ll>>> dp(sz(s)+1, vector<vector<ll>>(3, vector<ll>(2,-1)));
-	function<ll(int,int,int)> dfs = [&](int idx, int num, int ok) -> ll {
-		if(idx == sz(s)) 
-			return (int)(num == 0);
-
-		ll& ret = dp[idx][num][ok];
-		if(ret != -1)
-			return ret;
-		ret = 0;
-		
-		if(ok) {
-			for(int i=0 ; i<=9 ; i++) {
-				ret += dfs(idx+1, (num+i)%3, ok);
-				ret %= MOD;
-			}
-		} else {
-			int cur = s[idx] - '0';
-			for(int i=0 ; i<cur ; i++) {
-				ret += dfs(idx+1, (num+i)%3, true);
-				ret %= MOD;
-			}
-			ret += dfs(idx+1, (num+cur)%3, false);
-			ret %= MOD;
-		}
-		return ret;
-	};	
-	ll ans = 0;
-	for(int i=0 ; i<(int)(s[0]-'0') ; i++) {
-		ans += dfs(1, i%3, true);
-		ans %= MOD;
-	}
-	ans += dfs(1, (int)(s[0]-'0')%3, false);
-	ans -= 1;
-	ans %= MOD;
-	ans += MOD;
-	ans %= MOD;
-	return ans;
-}
-
 ll solve2(string s) { // 1~s까지 3, 6, 9을 사용하는 숫자가 몇개 있는지
 	// 3, 6, 9를 쓰지 않아보자
 	vector<vector<ll>> dp(sz(s)+1, vector<ll>(2, -1));
@@ -163,12 +123,10 @@ ll solve3(string s) { // 3의 배수이나, 3, 6, 9를 쓰지 않는 애들 갯�
 }
 
 ll solve(string s) {
-	ll a1 = solve1(s); // 3의 배수의 갯수 
 	ll a2 = solve2(s); // 3, 6, 9를 사용하는 애들의 갯수
 	ll a3 = solve3(s); // 3의 배수이면서 3, 6, 9를 사용하지 않는 애들
 
-	ll gyo = a1 - a3;
-	ll ans = a1 + a2 - gyo;
+	ll ans = a2 + a3;
 	ans %= MOD; ans += MOD; ans %= MOD;
 	return ans;
 }

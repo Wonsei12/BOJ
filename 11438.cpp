@@ -18,6 +18,11 @@ using namespace std;
 #define sz(x) (int)x.size()
 #define pw(x) (1LL<<x)
 
+using pii = pair<int, int>;
+using ll = long long;
+const ll MOD = 1e9 + 7;
+const long double PI = acos(-1.0);
+
 // Copied from Gennady-Korotkevich's template
 
 template <typename A, typename B>
@@ -117,25 +122,89 @@ void debug_out(Head H, Tail... T) {
 
 // End of Gennady-Korotkevich's template 
 
-using pii = pair<int, int>;
-using ll = long long;
-const ll MOD = 1e9 + 7;
-const long double PI = acos(-1.0);
+struct LCA {
+	vector<int> height, euler, first, seg;
+	vector<bool> vis;
+	int n;
 
-ll euclid(ll x, ll y, ll &k, ll &l) {
-	if (y == 0) {
-		k = 1;
-		l = 0;
-		return x;
+	LCA(vector<vector<int>> &G, int root = 0) {
+		n = sz(G);
+		height = vector<int> (n);
+		first = vector<int> (n);
+		euler.reserve(n*2);
+		vis = vector<bool>(n,0);
+		dfs(G,root);
+		int m = sz(euler);
+		seg = vector<int>(4*m);
+		build(1,0,m-1);
 	}
-	ll g = euclid(y, x % y, l, k);
-	l -= k * (x / y);
-	return g;
+
+	void dfs(vector<vector<int>> &G, int node, int h=0) {
+		vis[node] = true;
+		height[node] = h;
+		first[node] = sz(euler);
+		euler.push_back(node);
+		for(int to : G[node]) {
+			if(!vis[to]) {
+				dfs(G,to,h+1);
+				euler.push_back(node);
+			}
+		}
+	}
+
+	void build(int node, int b, int e) {
+		if(b==e) {
+			seg[node] = euler[b];
+		} else {
+			int mid = (b + e) / 2;
+			build(node << 1, b, mid);
+			build(node << 1 + 1, mid + 1, e);
+			int l = seg[node << 1];
+			int r = seg[node << 1 + 1];
+			seg[node] = (height[l] < height[r]) ? l : r;
+		}
+	}
+
+	int query(int node, int b, int e, int L, int R) {
+		if(b > R || e < L)
+			return -1;
+		if(b >= L && e <= R)
+			return seg[node];
+		int mid = (b + e) / 2;
+		int left = query(node << 1, b, mid, L, R);
+		int right = query(node << 1 + 1, mid + 1, e, L, R);
+		if(left == -1) return right;
+		if(right == -1) return left;
+		return height[left] < height[right] ? left : right;
+	}
+
+	int lca(int u, int v) {
+		int left = first[u], right = first[v];
+		if(left > right)
+			swap(left, right);
+		return query(1,0,sz(euler)-1,left,right);
+	}
+};
+
+void solve() {
+	int n; cin >> n;
+	vector<vector<int>> G(n);
+	for(int i=0 ; i<n-1 ; i++) {
+		int u, v; cin >> u >> v; u--, v--;
+		G[u].push_back(v);
+		G[v].push_back(u);
+	}
+	LCA t = LCA(G,0);
+	int q; cin >> q;
+	while(q--) {
+		int u, v; cin >> u >> v; u--, v--;
+		cout << t.lca(u,v) << "\n";
+	}
 }
 
-ll ceil(ll a, ll b) {
-	if(a >= 0) 
-		return (a+b-1) / a;
-	else
-		return a/b;
+int main() {
+	IOS;
+	int t; t=1;
+	while(t--)
+		solve();
 }

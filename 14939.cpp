@@ -122,20 +122,57 @@ using ll = long long;
 const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
 
-ll euclid(ll x, ll y, ll &k, ll &l) {
-	if (y == 0) {
-		k = 1;
-		l = 0;
-		return x;
+void solve() {
+	vector<string> a(12),b;
+	for(int i=0 ; i<10 ; i++)
+		cin >> a[i];
+	b=a;
+	int ans1=0;
+	bool fail1=false;
+	auto tg = [&](int x, int y) -> void { 
+		a[x][y] = 'O' + '#' - a[x][y];
+	};
+	for(int i=0 ; i<10 ; i++) {
+		for(int j=0 ; j<10 ; j++) {
+			if(i+j==0)
+				continue;
+			if(i>0&&j>0&&a[i-1][j]!=a[i][j-1])
+				fail1=true;
+			if(i>0&&j>0&&a[i-1][j]=='O') {
+				tg(i,j);
+				tg(i,j-1);
+				tg(i-1,j);
+				if(j+1<10)
+					tg(i,j+1);
+				if(i+1<10)
+					tg(i+1,j);
+			}
+			else if(i>0&&a[i-1][j]=='O') {
+				tg(i,j);
+				tg(i-1,j);
+				if(j+1<10)
+					tg(i,j+1);
+				if(i+1<10)
+					tg(i+1,j);
+			}
+			else if(j>0&&a[i][j-1]=='O') {
+				tg(i,j);
+				tg(i,j-1);
+				if(j+1<10)
+					tg(i,j+1);
+				if(i+1<10)
+					tg(i+1,j);
+			}
+		}
 	}
-	ll g = euclid(y, x % y, l, k);
-	l -= k * (x / y);
-	return g;
+	debug(a);
+	if(fail1)
+		ans1=INF;
 }
 
-ll ceil(ll a, ll b) {
-	if(a >= 0) 
-		return (a+b-1) / a;
-	else
-		return a/b;
+int main() {
+	IOS;
+	int t; t = 1;
+	while(t--)
+		solve();
 }

@@ -18,6 +18,11 @@ using namespace std;
 #define sz(x) (int)x.size()
 #define pw(x) (1LL<<x)
 
+using pii = pair<int, int>;
+using ll = long long;
+const ll MOD = 1e9 + 7;
+const long double PI = acos(-1.0);
+
 // Copied from Gennady-Korotkevich's template
 
 template <typename A, typename B>
@@ -117,62 +122,64 @@ void debug_out(Head H, Tail... T) {
 
 // End of Gennady-Korotkevich's template 
 
-using pii = pair<int, int>;
-using ll = long long;
-const ll MOD = 1e9 + 7;
-const long double PI = acos(-1.0);
+struct Point2D {
+	double x;
+	double y;
+};
+
+bool cmp(Point2D p1, Point2D p2) {
+	if(p1.y == p2.y)
+		return p1.x < p2.x;
+	return p1.y < p2.y;
+}
+
+bool cmp2(Point2D p1, Point2D p2) {
+	if(p1.y * p2.x != p2.y * p1.x)
+		return p1.y * p2.x < p2.y * p1.x;
+	if(p1.y != p2.y)
+		return p1.y < p2.y;
+	return p1.x < p2.x;
+}
+
+int ccw(Point2D p1, Point2D p2, Point2D p3) {
+	// p1p2 -> p2p3 
+	// returns 1 if CCW, 0 if straight, -1 if CW 
+	double CCW = p1.x * p2.y + p2.x * p3.y + p3.x * p1.y - p1.y * p2.x - p2.y * p3.x - p3.y * p1.x;
+	if(CCW > 0)
+		return 1;
+	else if(CCW == 0)
+		return 0;
+	else if(CCW < 0)
+		return -1;
+}
 
 void solve() {
 	int n; cin >> n;
-	vector<vector<int>> G(n);
-	for(int i=0 ; i<n-1 ; i++) {
-		int u, v; cin >> u >> v; u--, v--;
-		G[u].push_back(v);
-		G[v].push_back(u);
+	vector<Point2D> p(n);
+	for(int i=0 ; i<n ; i++) {
+		cin >> p[i].x >> p[i].y;
 	}
-	vector<vector<int>> par(n, vector<int>(21));
-	vector<int> dep(n);
-	function<void(int, int, int)> dfs = [&](int v, int d, int p) {
-		par[v][0] = p;
-		dep[v] = d;
-		for(int nxt : G[v]) {
-			if(nxt == p) continue;
-			dfs(nxt, d+1, v);
-		}
-	};
-	dfs(0,0,0);
-	for(int x=1 ; x<21 ; x++) {
-		for(int v=0 ; v<n ; v++) {
-			par[v][x] = par[par[v][x-1]][x-1];
-		}
+	sort(p.begin(),p.end(),cmp);
+	for(int i=1 ; i<n ; i++) {
+		p[i].x -= p[0].x; 
+		p[i].y -= p[0].y;
 	}
-	function<int(int, int)> LCA = [&](int x, int y) {
-		if(dep[x] > dep[y]) 
-			swap(x,y);
-		for(int i=20 ; i>=0 ; i--) {
-			if(dep[y]-dep[x] >= pw(i))
-				y = par[y][i];
-		}
-		if(x==y)
-			return x;
-		for(int i=20 ; i>=0 ; i--) {
-			if(par[x][i] != par[y][i]) {
-				x = par[x][i];
-				y = par[y][i];
-			}
-		}
-		return par[x][0];
-	};
-	int q; cin >> q;
-	while(q--) {
-		int u, v; cin >> u >> v; u--, v--;
-		cout << LCA(u,v) + 1 << "\n";
+	p[0].x = 0; p[0].y = 0;
+	sort(p.begin()+1,p.end(),cmp2);
+
+	vector<Point2D> hull;
+	for(int i=0 ; i<n ; i++) {
+		while(sz(hull) >= 2 && ccw(hull[sz(hull) - 2], hull.back(), p[i]) <= 0)
+			hull.pop_back();
+		hull.push_back(p[i]);
 	}
+
+	cout << sz(hull) << "\n";
 }
 
 int main() {
 	IOS;
-	int t = 1;
+	int t; t = 1;
 	while(t--)
 		solve();
 }

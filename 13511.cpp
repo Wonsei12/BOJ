@@ -25,21 +25,22 @@ const long double PI = acos(-1.0);
 
 void solve() {
 	int n; cin >> n;
-	vector<vector<pii>> G(n);
+	vector<vector<pair<int, ll>>> G(n);
 	for(int i=0 ; i<n-1 ; i++) {
-		int u, v, w; cin >> u >> v >> w; u--, v--;
+		int u, v; ll w; cin >> u >> v >> w; u--, v--;
 		G[u].push_back({v,w});
 		G[v].push_back({u,w});
 	}
-	vector<int> dep(n), dep2(n); // real , 단계
 	vector<vector<int>> par(n, vector<int>(21));
-	function<void(int, int, int, int)> dfs = [&](int v, int d, int d2, int p) {
-		dep[v] = d;
-		dep2[v] = d2;
+	vector<int> dep(n);
+	vector<ll> dis(n);
+	function<void(int, int, ll, int)> dfs = [&](int v, int d, ll d2, int p) {
 		par[v][0] = p;
+		dep[v] = d;
+		dis[v] = d2;
 		for(pii nxt : G[v]) {
 			if(nxt.ff == p) continue;
-			dfs(nxt.ff, d + nxt.ss, d2 + 1, v);
+			dfs(nxt.ff, d + 1, d2 + nxt.ss, v);
 		}
 	};
 	dfs(0,0,0,0);
@@ -49,10 +50,10 @@ void solve() {
 		}
 	}
 	function<int(int, int)> LCA = [&](int x, int y) {
-		if(dep2[x] > dep2[y]) 
+		if(dep[x] > dep[y]) 
 			swap(x,y);
 		for(int i=20 ; i>=0 ; i--) {
-			if(dep2[y]-dep2[x] >= pw(i))
+			if(dep[y]-dep[x] >= pw(i))
 				y = par[y][i];
 		}
 		if(x==y)
@@ -67,9 +68,28 @@ void solve() {
 	};
 	int q; cin >> q;
 	while(q--) {
-		int u, v; cin >> u >> v; u--, v--;
-		int p = LCA(u,v);
-		cout << dep[u] + dep[v] - 2 * dep[p] << "\n";
+		int q1; cin >> q1;
+		if(q1==1) {
+			int u, v; cin >> u >> v; u--, v--;
+			int p = LCA(u,v);
+			cout << dis[u] + dis[v] - 2 * dis[p] << "\n";
+		} else {
+			int u, v, k; cin >> u >> v >> k; u--, v--, k--;
+			int p = LCA(u, v);
+			int depdis = dep[u] + dep[v] - 2 * dep[p];
+			int maj = u;
+			if(dep[u] - dep[p] <= k) {
+				k = depdis - k;
+				maj = v;
+			}
+			for(int i=20 ; i>=0 ; i--) {
+				if(k >= pw(i)) {
+					maj = par[maj][i];
+					k -= pw(i);	
+				}
+			}
+			cout << maj + 1 << "\n";
+		}
 	}
 }
 

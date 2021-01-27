@@ -18,6 +18,11 @@ using namespace std;
 #define sz(x) (int)x.size()
 #define pw(x) (1LL<<x)
 
+using pii = pair<int, int>;
+using ll = long long;
+const ll MOD = 1e9 + 7;
+const long double PI = acos(-1.0);
+
 // Copied from Gennady-Korotkevich's template
 
 template <typename A, typename B>
@@ -117,57 +122,59 @@ void debug_out(Head H, Tail... T) {
 
 // End of Gennady-Korotkevich's template 
 
-using pii = pair<int, int>;
-using ll = long long;
-const ll MOD = 1e9 + 7;
-const long double PI = acos(-1.0);
+class SegmentTree {
+public:
+	vector<ll> seg;
+	int n;
+	SegmentTree(int n) {
+		seg.resize(4 * n + 5);
+		this->n = n;
+	}
+	ll upd_(int idx, int l, int r, int pos, ll val) {
+		if (pos < l || pos > r) return seg[idx];
+		if (pos == l && pos == r) return seg[idx] += val;
+		int mid = (l + r) / 2;
+		return seg[idx] = upd_(idx * 2, l, mid, pos, val) +
+				upd_(idx * 2 + 1, mid + 1, r, pos, val);
+	}
+	ll calc_(int idx, int l, int r, int tl, int tr) {
+		if (tl > tr) return 0;
+		if (tl == l && tr == r) return seg[idx];
+		int mid = (l + r) / 2;
+		return calc_(idx * 2, l, mid, tl, min(tr, mid)) +
+			calc_(idx * 2 + 1, mid + 1, r, max(mid + 1, tl), tr);
+	}
+	ll find_(int idx, int l, int r, ll rank) {
+		if(l==r) return l;
+		int mid = (l+r)/2;
+		if(seg[idx*2]>=rank) return find_(idx*2,l,mid,rank);
+		else return find_(idx*2+1,mid+1,r,rank-seg[idx*2]); 
+	}
+	void upd(int pos, ll val) {
+		upd_(1, 0, n - 1, pos, val);
+	}
+	ll calc(int l, int r) {
+		return calc_(1, 0, n - 1, l, r);
+	} 
+	ll find(ll rank) {
+		return find_(1, 0, n-1, rank);
+	}
+};
 
 void solve() {
-	int n; cin >> n;
+	int n, q; cin >> n >> q;
+	vector<ll> a(n);
 	vector<vector<int>> G(n);
-	for(int i=0 ; i<n-1 ; i++) {
-		int u, v; cin >> u >> v; u--, v--;
-		G[u].push_back(v);
-		G[v].push_back(u);
+	for(int i=0 ; i<n ; i++)
+		cin >> a[i];
+	for(int i=1 ; i<n ; i++) {
+		int p; cin >> p; p--;
+		G[p].push_back(i);
 	}
-	vector<vector<int>> par(n, vector<int>(21));
-	vector<int> dep(n);
-	function<void(int, int, int)> dfs = [&](int v, int d, int p) {
-		par[v][0] = p;
-		dep[v] = d;
-		for(int nxt : G[v]) {
-			if(nxt == p) continue;
-			dfs(nxt, d+1, v);
-		}
-	};
-	dfs(0,0,0);
-	for(int x=1 ; x<21 ; x++) {
-		for(int v=0 ; v<n ; v++) {
-			par[v][x] = par[par[v][x-1]][x-1];
-		}
+	for(int i=0 ; i<n ; i++) {
+		sort(G[i].begin(),G[i].end());
 	}
-	function<int(int, int)> LCA = [&](int x, int y) {
-		if(dep[x] > dep[y]) 
-			swap(x,y);
-		for(int i=20 ; i>=0 ; i--) {
-			if(dep[y]-dep[x] >= pw(i))
-				y = par[y][i];
-		}
-		if(x==y)
-			return x;
-		for(int i=20 ; i>=0 ; i--) {
-			if(par[x][i] != par[y][i]) {
-				x = par[x][i];
-				y = par[y][i];
-			}
-		}
-		return par[x][0];
-	};
-	int q; cin >> q;
-	while(q--) {
-		int u, v; cin >> u >> v; u--, v--;
-		cout << LCA(u,v) + 1 << "\n";
-	}
+	
 }
 
 int main() {

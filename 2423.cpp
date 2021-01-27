@@ -18,6 +18,11 @@ using namespace std;
 #define sz(x) (int)x.size()
 #define pw(x) (1LL<<x)
 
+using pii = pair<int, int>;
+using ll = long long;
+const ll MOD = 1e9 + 7;
+const long double PI = acos(-1.0);
+
 // Copied from Gennady-Korotkevich's template
 
 template <typename A, typename B>
@@ -117,62 +122,60 @@ void debug_out(Head H, Tail... T) {
 
 // End of Gennady-Korotkevich's template 
 
-using pii = pair<int, int>;
-using ll = long long;
-const ll MOD = 1e9 + 7;
-const long double PI = acos(-1.0);
+struct cmp {
+	bool operator() (pii a, pii b) {
+		return a.ss > b.ss;
+	}
+};
 
 void solve() {
-	int n; cin >> n;
-	vector<vector<int>> G(n);
-	for(int i=0 ; i<n-1 ; i++) {
-		int u, v; cin >> u >> v; u--, v--;
-		G[u].push_back(v);
-		G[v].push_back(u);
+	int n, m; cin >> n >> m;
+	vector<string> s(n);
+	vector<vector<pii>> G((n+1)*(m+1)+1);
+	for(int i=0 ; i<n ; i++) {
+		cin >> s[i];
 	}
-	vector<vector<int>> par(n, vector<int>(21));
-	vector<int> dep(n);
-	function<void(int, int, int)> dfs = [&](int v, int d, int p) {
-		par[v][0] = p;
-		dep[v] = d;
-		for(int nxt : G[v]) {
-			if(nxt == p) continue;
-			dfs(nxt, d+1, v);
-		}
+	auto add_edge = [&](int i1, int j1, int i2, int j2, int val) {
+		int v1 = i1 * (m+1) + j1;
+		int v2 = i2 * (m+1) + j2;
+		G[v1].push_back({v2,val});
+		G[v2].push_back({v1,val});
 	};
-	dfs(0,0,0);
-	for(int x=1 ; x<21 ; x++) {
-		for(int v=0 ; v<n ; v++) {
-			par[v][x] = par[par[v][x-1]][x-1];
-		}
-	}
-	function<int(int, int)> LCA = [&](int x, int y) {
-		if(dep[x] > dep[y]) 
-			swap(x,y);
-		for(int i=20 ; i>=0 ; i--) {
-			if(dep[y]-dep[x] >= pw(i))
-				y = par[y][i];
-		}
-		if(x==y)
-			return x;
-		for(int i=20 ; i>=0 ; i--) {
-			if(par[x][i] != par[y][i]) {
-				x = par[x][i];
-				y = par[y][i];
+	for(int i=0 ; i<n ; i++) {
+		for(int j=0 ; j<m ; j++) {
+			if(s[i][j] == '\\') {
+				add_edge(i,j,i+1,j+1,0);
+				add_edge(i,j+1,i+1,j,1);
+			} else {
+				add_edge(i,j,i+1,j+1,1);
+				add_edge(i,j+1,i+1,j,0);
 			}
 		}
-		return par[x][0];
-	};
-	int q; cin >> q;
-	while(q--) {
-		int u, v; cin >> u >> v; u--, v--;
-		cout << LCA(u,v) + 1 << "\n";
+	}
+	priority_queue<pii, vector<pii>, cmp> pq;
+	vector<int> dis((n+1)*(m+1)+1, INF);
+	pq.push({0,0}); dis[0] = 0;
+	while(!pq.empty()) {
+		int cur = pq.top().ff, curDis = pq.top().ss; pq.pop();
+		if(curDis > dis[cur]) continue;
+		for(pii nxt : G[cur]) {
+			if(dis[nxt.ff] > curDis + nxt.ss) {
+				dis[nxt.ff] = curDis + nxt.ss;
+				pq.push({nxt.ff, dis[nxt.ff]});
+			}
+		}
+	}
+	if(dis[(n+1)*(m+1)-1]==INF) {
+		cout << "NO SOLUTION\n";
+	} else {
+		cout << dis[(n+1)*(m+1)-1] << "\n";
 	}
 }
 
 int main() {
 	IOS;
-	int t = 1;
+	int t; t = 1;
 	while(t--)
 		solve();
 }
+

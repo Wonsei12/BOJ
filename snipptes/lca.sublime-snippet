@@ -1,0 +1,41 @@
+<snippet>
+	<content><![CDATA[
+vector<vector<int>> par(n, vector<int>(21));
+vector<int> dep(n);
+function<void(int, int, int)> dfs = [&](int v, int d, int p) {
+	par[v][0] = p;
+	dep[v] = d;
+	for(int nxt : G[v]) {
+		if(nxt == p) continue;
+		dfs(nxt, d+1, v);
+	}
+};
+dfs(0,0,0);
+for(int x=1 ; x<21 ; x++) {
+	for(int v=0 ; v<n ; v++) {
+		par[v][x] = par[par[v][x-1]][x-1];
+	}
+}
+function<int(int, int)> LCA = [&](int x, int y) {
+	if(dep[x] > dep[y]) 
+		swap(x,y);
+	for(int i=20 ; i>=0 ; i--) {
+		if(dep[y]-dep[x] >= pw(i))
+			y = par[y][i];
+	}
+	if(x==y)
+		return x;
+	for(int i=20 ; i>=0 ; i--) {
+		if(par[x][i] != par[y][i]) {
+			x = par[x][i];
+			y = par[y][i];
+		}
+	}
+	return par[x][0];
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>LCA</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

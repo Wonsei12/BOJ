@@ -1,0 +1,27 @@
+<snippet>
+	<content><![CDATA[
+vector<vector<int>> sparse_table(n, vector<int>(25));
+for(int i=0 ; i<n ; i++) {
+	sparse_table[i][0] = a[i];
+}
+for(int pw=1 ; pw<25 ; pw++) {
+	for(int i=0 ; i+(1LL<<(pw-1))<n ; i++) {
+		sparse_table[i][pw] = min(sparse_table[i][pw-1], sparse_table[i+(1LL<<(pw-1))][pw-1]);
+	}
+}
+vector<int> log(n+1);
+log[1] = 0;
+for(int i=2 ; i<=n ; i++)
+	log[i] = log[i/2] + 1;
+int q; cin >> q;
+while(q--) {
+	int s, e; cin >> s >> e;
+	int lg = log[e-s+1];
+	cout << min(sparse_table[s][lg],sparse_table[e-(1<<lg)+1][lg]) << "\n";
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>sparse</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

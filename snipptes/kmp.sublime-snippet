@@ -1,0 +1,35 @@
+<snippet>
+	<content><![CDATA[
+string p, s;
+vector<int> fail, ans;
+
+void find_fail() {
+	int n = sz(p), j = 0;
+	for(int i=1 ; i<n ; i++) {
+		while(j>0 && p[i]!=p[j])
+			j = fail[j-1];
+		if(p[i]==p[j])
+			fail[i] = ++j;
+	}
+}
+
+void kmp() {
+	int n = sz(s), m = sz(p), j=0;
+	for(int i=0 ; i<n ; i++) {
+		while(j>0 && s[i]!=p[j])
+			j = fail[j-1];
+		if(s[i]==p[j]) {
+			if(j==m-1) {
+				ans.push_back(i-m+1);
+				j = fail[j];
+			} else
+				j++;
+		}
+	}
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>kmp</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,71 @@
+<snippet>
+	<content><![CDATA[
+struct MSP {
+	ll sum, lmax, rmax, tmax;
+};
+
+class SegmentTree {
+public:
+	vector<MSP> seg;
+	int n;
+	SegmentTree(int n) {
+		seg.resize(4 * n + 5);
+		this->n = n;
+	}
+	MSP upd_(int idx, int l, int r, int pos, ll val) {
+		if (pos < l || pos > r) return seg[idx];
+		if (pos == l && pos == r) {
+			seg[idx].sum += val;
+			seg[idx].lmax += val;
+			seg[idx].rmax += val;
+			seg[idx].tmax += val;
+			return seg[idx];
+		}
+		int mid = (l + r) / 2;
+		MSP L = upd_(idx * 2, l, mid, pos, val);
+		MSP R = upd_(idx * 2 + 1, mid + 1, r, pos, val);
+		seg[idx].sum = L.sum + R.sum;
+		seg[idx].lmax = max(L.lmax, L.sum + R.lmax);
+		seg[idx].rmax = max(R.rmax, L.rmax + R.sum);
+		seg[idx].tmax = max({L.tmax, R.tmax, L.rmax + R.lmax});
+		return seg[idx];
+	}
+	MSP calc_(int idx, int l, int r, int tl, int tr) {
+		if (tl > tr) {
+			MSP ret;
+			ret.sum = -INF;
+			ret.lmax = -INF;
+			ret.rmax = -INF;
+			ret.tmax = -INF;
+			return ret;
+		}
+		if (tl == l && tr == r) return seg[idx];
+		int mid = (l + r) / 2;
+		MSP L = calc_(idx * 2, l, mid, tl, min(tr, mid));
+		MSP R = calc_(idx * 2 + 1, mid + 1, r, max(mid + 1, tl), tr);
+		if(L.sum == -INF)
+			return R;
+		if(R.sum == -INF)
+			return L;
+		MSP ret;
+		ret.sum = L.sum + R.sum;
+		ret.lmax = max(L.lmax, L.sum + R.lmax); 
+		ret.rmax = max(R.rmax, R.sum + L.rmax);
+		ret.tmax = max({L.tmax, R.tmax, L.rmax + R.lmax});
+		return ret;
+	}
+	MSP upd(int pos, ll val) {
+		return upd_(1, 0, n-1, pos, val);
+	}
+	ll calc(int l, int r) {
+		MSP ret = calc_(1, 0, n-1, l, r);
+		return ret.tmax;
+	}
+};
+
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>msp</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

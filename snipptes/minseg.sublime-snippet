@@ -1,0 +1,41 @@
+<snippet>
+	<content><![CDATA[
+class SegmentTree {
+public:
+	vector<ll> seg;
+	int n;
+	SegmentTree(int n) {
+		seg.resize(4 * n + 5);
+		this->n = n;
+	}
+	ll upd_(int idx, int l, int r, int pos, ll val) {
+		if (pos < l || pos > r) return seg[idx];
+		if (pos == l && pos == r) return seg[idx] = val;
+		int mid = (l + r) / 2;
+		return seg[idx] = min(
+			upd_(idx * 2, l, mid, pos, val),
+			upd_(idx * 2 + 1, mid + 1, r, pos, val)
+			);
+	}
+	ll calc_(int idx, int l, int r, int tl, int tr) {
+		if (tl > tr) return LLINF;
+		if (tl == l && tr == r) return seg[idx];
+		int mid = (l + r) / 2;
+		return min(
+			calc_(idx * 2, l, mid, tl, min(tr, mid)),
+			calc_(idx * 2 + 1, mid + 1, r, max(mid + 1, tl), tr)
+			);
+	}
+	void upd(int pos, ll val) {
+		upd_(1, 0, n - 1, pos, val);
+	}
+	ll calc(int l, int r) {
+		return calc_(1, 0, n - 1, l, r);
+	}
+};
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>minseg</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

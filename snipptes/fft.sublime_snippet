@@ -1,0 +1,66 @@
+<snippet>
+	<content><![CDATA[
+vector<complex<double>> fft_(vector<complex<double>> a, bool inverse) {
+	int n = (int)a.size();
+	if(n == 1) return a;
+	complex<double> w;
+	if(!inverse) {
+		complex<double> k(0, 2 * PI / n);
+		w = exp(k);
+	} else {
+		complex<double> k(0, -2 * PI / n);
+		w = exp(k);
+		w /= complex<double>(n, 0);
+	}
+	complex<double> orig = w;
+
+	vector<complex<double>> even, odd;
+	for(int i=0 ; i<n ; i+=2) {
+		even.push_back(a[i]);
+	}
+	for(int i=1 ; i<n ; i+=2) {
+		odd.push_back(a[i]);
+	}
+	vector<complex<double>> even_ = fft_(even, inverse);
+	vector<complex<double>> odd_ = fft_(odd, inverse);
+	vector<complex<double>> ans(n);
+	for(int i=0 ; i<n/2 ; i++) {
+		ans[i] = even_[i] + w * odd_[i];
+		ans[i + n/2] = even_[i] - w * odd_[i];
+		w *= orig;
+	}
+	return ans;
+}
+
+vector<int> fft(vector<int> a, vector<int> b) {
+	int n = (int)a.size();
+	int m = (int)b.size();
+	int mx = max(n, m);
+	int pw = 1;
+	while(pw < mx) {
+		pw *= 2;
+	}
+	vector<complex<double>> a_(pw);
+	vector<complex<double>> b_(pw);
+	for(int i=0 ; i<n ; i++)
+		a_[i] = complex<double>(a[i], 0);
+	for(int i=0 ; i<m ; i++)
+		b_[i] = complex<double>(b[i], 0);
+
+	vector<complex<double>> a__ = fft_(a_, false);
+	vector<complex<double>> b__ = fft_(b_, false);
+	
+	vector<complex<double>> res(pw);
+	for(int i=0; i<pw ; i++) {
+		res[i] = a__[i] * b__[i];
+	}
+	vector<complex<double>> res2 = fft_(res, true);
+	
+	return {1};
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>fft</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

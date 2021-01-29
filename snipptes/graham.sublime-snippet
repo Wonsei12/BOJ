@@ -1,0 +1,41 @@
+<snippet>
+	<content><![CDATA[
+bool cmp(Point2D p1, Point2D p2) {
+	if(p1.y == p2.y)
+		return p1.x < p2.x;
+	return p1.y < p2.y;
+}
+
+bool cmp2(Point2D p1, Point2D p2) {
+	if(p1.y * p2.x != p2.y * p1.x)
+		return p1.y * p2.x < p2.y * p1.x;
+	if(p1.y != p2.y)
+		return p1.y < p2.y;
+	return p1.x < p2.x;
+}
+
+int n; cin >> n;
+vector<Point2D> p(n);
+for(int i=0 ; i<n ; i++) {
+	cin >> p[i].x >> p[i].y;
+}
+sort(p.begin(),p.end(),cmp);
+for(int i=1 ; i<n ; i++) {
+	p[i].x -= p[0].x; 
+	p[i].y -= p[0].y;
+}
+p[0].x = 0; p[0].y = 0;
+sort(p.begin()+1,p.end(),cmp2);
+
+vector<Point2D> hull;
+for(int i=0 ; i<n ; i++) {
+	while(sz(hull) >= 2 && ccw(hull[sz(hull) - 2], hull.back(), p[i]) <= 0)
+		hull.pop_back();
+	hull.push_back(p[i]);
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>graham</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

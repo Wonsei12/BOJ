@@ -1,0 +1,18 @@
+<snippet>
+	<content><![CDATA[
+ll euclid(ll x, ll y, ll &k, ll &l) {
+	if (y == 0) {
+		k = 1;
+		l = 0;
+		return x;
+	}
+	ll g = euclid(y, x % y, l, k);
+	l -= k * (x / y);
+	return g;
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>euclid</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

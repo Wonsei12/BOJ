@@ -1,0 +1,27 @@
+<snippet>
+	<content><![CDATA[
+ll add(ll x, ll y) {
+	x+=y; x%=MOD;
+	return x;
+}
+ll sub(ll x, ll y) {
+	x-=y; x%=MOD; if(x<0) x+=MOD;
+	return x;
+}
+ll mult(ll x, ll y) {
+	return (x*y)%MOD;
+}
+ll bin_pow(ll x, ll p) {
+	if(p==0) return 1;
+	if(p&1) return mult(x,bin_pow(x,p-1));
+	return bin_pow(mult(x,x),p/2);
+}
+ll rev(ll x) {
+	return bin_pow(x,MOD-2);
+}
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>mint</tabTrigger>
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<!-- <scope>source.python</scope> -->
+</snippet>

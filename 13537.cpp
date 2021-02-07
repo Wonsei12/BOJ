@@ -183,9 +183,9 @@ int main() {
 		q.push_back({{l,r},{k,i}});
 	}
 
-	debug(pos);
+
 	sort(q.begin(),q.end(),cmp);
-	debug(q);
+
 	int cur = sz(b) - 1;
 
 	vector<int> ans(t);
@@ -195,7 +195,7 @@ int main() {
 		int bound = q[i].ss.ff;
 		int l = q[i].ff.ff, r = q[i].ff.ss;
 		while(1) {
-			if(b[cur] > bound) {
+			if(cur >= 0 && b[cur] > bound) {
 				for(int e : pos[cur]) {
 					st.upd(e,1);
 				}

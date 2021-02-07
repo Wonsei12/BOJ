@@ -1,12 +1,5 @@
-#define LOCAL
-
 #include <bits/stdc++.h>
 using namespace std;
-
-#pragma GCC optimize("O3")
-#pragma GCC optimize("Ofast")
-#pragma GCC optimize("unroll-loops")
-#pragma GCC target("avx,avx2")
 
 #define IOS ios::sync_with_stdio(false);cin.tie(0)
 #define all(x) x.begin(), x.end()
@@ -22,105 +15,6 @@ using pii = pair<int, int>;
 using ll = long long;
 const ll MOD = 1e9 + 7;
 const long double PI = acos(-1.0);
-
-// Copied from Gennady-Korotkevich's template
-
-template <typename A, typename B>
-string to_string(pair<A, B> p);
-
-template <typename A, typename B, typename C>
-string to_string(tuple<A, B, C> p);
-
-template <typename A, typename B, typename C, typename D>
-string to_string(tuple<A, B, C, D> p);
-
-string to_string(const string& s) {
-	return '"' + s + '"';
-}
-
-string to_string(const char* s) {
-	return to_string((string)s);
-}
-
-string to_string(bool b) {
-	return (b ? "true" : "false");
-}
-
-string to_string(vector<bool> v) {
-	bool first = true;
-	string res = "{";
-	for (int i = 0; i < static_cast<int>(v.size()); i++) {
-		if (!first) {
-			res += ", ";
-		}
-		first = false;
-		res += to_string(v[i]);
-	}
-	res += "}\n";
-	return res;
-}
-
-template <size_t N>
-string to_string(bitset<N> v) {
-	string res = "";
-	for (size_t i = 0; i < N; i++) {
-		res += static_cast<char>('0' + v[i]);
-	}
-	return res;
-}
-
-template <typename A>
-string to_string(A v) {
-	bool first = true;
-	string res = "{";
-	for (const auto& x : v) {
-		if (!first) {
-			res += ", ";
-		}
-		first = false;
-		res += to_string(x);
-	}
-	res += "}\n";
-	return res;
-}
-
-template <typename A, typename B>
-string to_string(pair<A, B> p) {
-	return "(" + to_string(p.first) + ", " + to_string(p.second) + ")";
-}
-
-template <typename A, typename B, typename C>
-string to_string(tuple<A, B, C> p) {
-	return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ")";
-}
-
-template <typename A, typename B, typename C, typename D>
-string to_string(tuple<A, B, C, D> p) {
-	return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + ")";
-}
-
-template <typename A, typename B, typename C, typename D, typename E>
-string to_string(tuple<A, B, C, D, E> p) {
-	return "(" + to_string(get<0>(p)) + ", " + to_string(get<1>(p)) + ", " + to_string(get<2>(p)) + ", " + to_string(get<3>(p)) + "," + to_string(get<4>(p)) + ")";
-}
-
-void debug_out() {
-	cerr << endl;
-}
-
-template <typename Head, typename... Tail>
-void debug_out(Head H, Tail... T) {
-	cerr << " " << to_string(H);
-	debug_out(T...);
-}
-
-#ifdef LOCAL
-#define debug(...) cerr << "\n[" << #__VA_ARGS__ << "]:\n", debug_out(__VA_ARGS__)
-#else
-#define debug(...) 42
-#endif
-
-// End of Gennady-Korotkevich's template 
 
 class SegmentTree {
 public:
@@ -161,25 +55,58 @@ public:
 	}
 };
 
-void solve() {
-	int n, q; cin >> n >> q;
-	vector<ll> a(n);
-	vector<vector<int>> G(n);
-	for(int i=0 ; i<n ; i++)
-		cin >> a[i];
-	for(int i=1 ; i<n ; i++) {
-		int p; cin >> p; p--;
-		G[p].push_back(i);
-	}
-	for(int i=0 ; i<n ; i++) {
-		sort(G[i].begin(),G[i].end());
-	}
-	
+bool cmp(pair<int, pii> a, pair<int, pii> b) {
+	return a.ss.ff < b.ss.ff;
+}
+
+bool cmp2(pii a, pii b) {
+	return a.ss < b.ss;
 }
 
 int main() {
 	IOS;
-	int t = 1;
-	while(t--)
-		solve();
+	int n; cin >> n;
+	int qq; cin >> qq;
+	vector<vector<int>> G(n);
+	vector<ll> a(n);
+	for(int i=0 ; i<n ; i++) 
+		cin >> a[i];
+	vector<pii> p(n); 
+	p[0] = {0,-1};
+	for(int i=1 ; i<n ; i++) {
+		int x; cin >> x; x--;
+		p[i] = {i,x};
+		G[x].push_back(i);
+	}
+	sort(p.begin(),p.end(),cmp2);
+	vector<ll> v(n);
+	function<ll(int)> val = [&](int x) {
+		ll ret = 0;
+		for(int nxt : G[x])
+			ret += val(nxt);
+		return v[x] = ret + a[x];
+	};
+	val(0);
+	vector<pair<int, pii>> q(qq);
+	for(int i=0 ; i<qq ; i++) {
+		q[i].ff = i;
+		cin >> q[i].ss.ff >> q[i].ss.ss;
+		q[i].ss.ff --, q[i].ss.ss --;
+	}
+	sort(q.begin(),q.end(),cmp);
+	SegmentTree st(n);
+
+	int idx = 0;
+	vector<ll> ans(qq);
+	for(int i=0 ; i<qq ; i++) {
+		while(idx < n && p[idx].ss < q[i].ss.ff) {
+			int z = p[idx].ff;
+			st.upd(z, v[z]);
+			idx += 1;
+		}
+		ans[q[i].ff] = st.calc(q[i].ss.ff, q[i].ss.ss);
+	}
+	for(auto x : ans) {
+		cout << x << "\n";
+	}
 }
